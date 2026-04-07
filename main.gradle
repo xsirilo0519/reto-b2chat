@@ -1,41 +1,32 @@
-// Configuración común para todos los subproyectos
-allprojects {
-    repositories {
-        mavenCentral()
-    }
-}
-
 subprojects {
     apply plugin: 'java'
     apply plugin: 'io.spring.dependency-management'
 
-    group = 'com.b2chat.order_manager'
-    version = '1.0.0-SNAPSHOT'
-
     java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(18)
-        }
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
+    }
+    repositories {
+        mavenCentral()
     }
 
     dependencies {
-        implementation 'org.springframework.boot:spring-boot-starter-webflux'
- //       implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-        implementation 'org.springframework.boot:spring-boot-starter-security'
-
+        implementation 'org.springframework.boot:spring-boot-starter-webflux:4.0.5'
+        //implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        //implementation 'org.springframework.boot:spring-boot-starter-security:2.7.5'
         // Lombok
-        compileOnly 'org.projectlombok:lombok'
-        annotationProcessor 'org.projectlombok:lombok'
-        testCompileOnly 'org.projectlombok:lombok'
-        testAnnotationProcessor 'org.projectlombok:lombok'
+        compileOnly 'org.projectlombok:lombok:1.18.30'
+        annotationProcessor 'org.projectlombok:lombok:1.18.30'
+        testCompileOnly 'org.projectlombok:lombok:1.18.30'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
 
         // Testing - JUnit 5
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.5'
         testImplementation 'org.junit.jupiter:junit-jupiter-api'
         testImplementation 'org.junit.jupiter:junit-jupiter-engine'
         testImplementation 'org.junit.jupiter:junit-jupiter-params'
-        testImplementation 'org.springframework.security:spring-security-test'
+        testImplementation 'org.springframework.security:spring-security-test:5.7.5'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
 

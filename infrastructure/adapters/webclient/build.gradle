@@ -1,4 +1,0 @@
-// Las dependencias comunes se heredan de main.gradle
-dependencies {
-    implementation project(':domain-model')
-}
