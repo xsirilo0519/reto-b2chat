@@ -2,6 +2,7 @@ package com.b2chat.order_manager.reactive.web.user;
 
 import com.b2chat.order_manager.domain.users.entity.UserEntity;
 import com.b2chat.order_manager.reactive.web.user.dto.UserDto;
+import com.b2chat.order_manager.reactive.web.user.dto.UserResponseDto;
 import com.b2chat.order_manager.reactive.web.user.mapper.UserMapper;
 import com.b2chat.order_manager.usecase.UsersUseCase;
 import org.springframework.http.ResponseEntity;
@@ -18,16 +19,18 @@ public class UserController {
     private final UsersUseCase usersUseCase;
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<UserEntity>> getUsersById(@PathVariable("id") String id) {
-        return usersUseCase.getUserById(id)
+    public Mono<ResponseEntity<UserResponseDto>> getUsersById(@PathVariable("id") String id) {
+        return usersUseCase.getUserByIdUseCase(id)
+                .map(UserMapper.INSTANCE::toResponse)
                 .map(ResponseEntity::ok)
                 .onErrorResume(e -> Mono.just(ResponseEntity.notFound().build()));
     }
 
     @PostMapping()
-    public Mono<ResponseEntity<UserEntity>> createUser(@RequestBody UserDto user) {
+    public Mono<ResponseEntity<UserResponseDto>> createUser(@RequestBody UserDto user) {
         UserEntity userEntity = UserMapper.INSTANCE.toEntity(user);
-        return usersUseCase.createUser(userEntity)
+        return usersUseCase.createUserUseCase(userEntity)
+                .map(UserMapper.INSTANCE::toResponse)
                 .map(ResponseEntity::ok)
                 .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().build()));
     }

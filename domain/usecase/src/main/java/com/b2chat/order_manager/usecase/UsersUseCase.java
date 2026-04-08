@@ -12,7 +12,7 @@ public class UsersUseCase {
 
     private final UserGateway userGateway;
 
-    public Mono<UserEntity> createUser(UserEntity userEntity) {
+    public Mono<UserEntity> createUserUseCase(UserEntity userEntity) {
         return Mono.just(userEntity.toBuilder()
                         .createdAt(LocalDateTime.now())
                         .updatedAt(LocalDateTime.now())
@@ -21,7 +21,7 @@ public class UsersUseCase {
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Error creating user"))));
     }
 
-    public Mono<UserEntity> getUserById(String userId) {
+    public Mono<UserEntity> getUserByIdUseCase(String userId) {
         return userGateway.getUserById(userId)
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("User not found with id: " + userId))));
     }

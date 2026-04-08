@@ -5,7 +5,7 @@ import com.b2chat.order_manager.repository.user.data.UserData;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserDataMapper {
     UserDataMapper INSTANCE = Mappers.getMapper(UserDataMapper.class);
 
