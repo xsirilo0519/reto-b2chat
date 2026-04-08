@@ -18,16 +18,18 @@ public class UserController {
     private final UsersUseCase usersUseCase;
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<String>> getUsersById(@PathVariable String id) {
+    public Mono<ResponseEntity<UserEntity>> getUsersById(@PathVariable("id") String id) {
         return usersUseCase.getUserById(id)
-                .map(ResponseEntity::ok);
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> Mono.just(ResponseEntity.notFound().build()));
     }
 
     @PostMapping()
     public Mono<ResponseEntity<UserEntity>> createUser(@RequestBody UserDto user) {
-        UserEntity userEntity = UserMapper.INTANCE.toEntity(user);
+        UserEntity userEntity = UserMapper.INSTANCE.toEntity(user);
         return usersUseCase.createUser(userEntity)
-                .map(ResponseEntity::ok);
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().build()));
     }
 
 }

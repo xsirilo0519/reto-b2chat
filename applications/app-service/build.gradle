@@ -4,5 +4,6 @@ dependencies {
     implementation project(':domain-model')
     implementation project(':domain-usecase')
     implementation project(':driven-adapters-web-client')
+    implementation project(':driven-adapters-postgresql-repository')
     implementation project(':entry-points-reactive-web')
 }
