@@ -5,5 +5,5 @@ import reactor.core.publisher.Mono;
 
 public interface UserGateway {
      Mono<UserEntity> createUser(UserEntity userEntity);
-     Mono<UserEntity> getUserById(String userId);
+     Mono<UserEntity> getUserById(Long userId);
 }

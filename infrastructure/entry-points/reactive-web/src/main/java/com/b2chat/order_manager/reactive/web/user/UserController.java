@@ -19,7 +19,7 @@ public class UserController {
     private final UsersUseCase usersUseCase;
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<UserResponseDto>> getUsersById(@PathVariable("id") String id) {
+    public Mono<ResponseEntity<UserResponseDto>> getUsersById(@PathVariable("id") Long id) {
         return usersUseCase.getUserByIdUseCase(id)
                 .map(UserMapper.INSTANCE::toResponse)
                 .map(ResponseEntity::ok)

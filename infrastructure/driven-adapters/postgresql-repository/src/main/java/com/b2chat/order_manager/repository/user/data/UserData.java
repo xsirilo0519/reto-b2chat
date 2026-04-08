@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class UserData {
     @Id
     @Column("id")
-    private String id;
+    private Long id;
     @Column("name")
     private String name;
     @Column("email")

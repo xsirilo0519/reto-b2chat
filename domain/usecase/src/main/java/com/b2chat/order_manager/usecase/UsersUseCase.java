@@ -21,7 +21,7 @@ public class UsersUseCase {
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Error creating user"))));
     }
 
-    public Mono<UserEntity> getUserByIdUseCase(String userId) {
+    public Mono<UserEntity> getUserByIdUseCase(Long userId) {
         return userGateway.getUserById(userId)
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("User not found with id: " + userId))));
     }

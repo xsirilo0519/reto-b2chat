@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class UserEntity {
-    private String id;
+    private Long id;
     private String name;
     private String email;
     private String address;

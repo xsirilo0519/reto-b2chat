@@ -5,10 +5,10 @@ import com.b2chat.order_manager.domain.users.gateway.UserGateway;
 import com.b2chat.order_manager.repository.user.mapper.UserDataMapper;
 import com.b2chat.order_manager.repository.user.repository.UserDataRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-@Repository
+@Component
 @RequiredArgsConstructor
 public class UserAdapter implements UserGateway {
 
@@ -22,7 +22,7 @@ public class UserAdapter implements UserGateway {
     }
 
     @Override
-    public Mono<UserEntity> getUserById(String userId) {
+    public Mono<UserEntity> getUserById(Long userId) {
         return userDataRepository.findById(userId)
                 .map(UserDataMapper.INSTANCE::toDomain)
                 .onErrorResume(e -> Mono.error(new RuntimeException("Error in db:" + e.getMessage())));
