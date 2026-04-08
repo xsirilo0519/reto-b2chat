@@ -2,4 +2,6 @@
 dependencies {
     implementation project(':domain-model')
     implementation 'org.springframework:spring-tx'
+
+    testImplementation 'io.projectreactor:reactor-test'
 }

@@ -1,6 +1,5 @@
 package com.b2chat.order_manager.rabbitmq.listener;
 
-import com.b2chat.order_manager.rabbitmq.config.RabbitMQConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -17,7 +16,7 @@ public class OrderNotificationListener {
 
     private final JavaMailSender mailSender;
 
-    @RabbitListener(queues = RabbitMQConfig.RECEIVED_QUEUE)
+    @RabbitListener(queues = "${rabbitmq.order.received-queue}")
     public void onOrderReceived(Map<String, Object> event) {
         String to        = (String) event.get("userEmail");
         String userName  = (String) event.get("userName");
@@ -31,7 +30,7 @@ public class OrderNotificationListener {
         log.info("Email enviado a {} por orden recibida [id={}]", to, orderId);
     }
 
-    @RabbitListener(queues = RabbitMQConfig.COMPLETED_QUEUE)
+    @RabbitListener(queues = "${rabbitmq.order.completed-queue}")
     public void onOrderCompleted(Map<String, Object> event) {
         String to       = (String) event.get("userEmail");
         String userName = (String) event.get("userName");
@@ -45,7 +44,7 @@ public class OrderNotificationListener {
         log.info("Email enviado a {} por orden completada [id={}]", to, orderId);
     }
 
-    @RabbitListener(queues = RabbitMQConfig.CANCELLED_QUEUE)
+    @RabbitListener(queues = "${rabbitmq.order.cancelled-queue}")
     public void onOrderCancelled(Map<String, Object> event) {
         String to       = (String) event.get("userEmail");
         String userName = (String) event.get("userName");
@@ -120,5 +119,3 @@ public class OrderNotificationListener {
         return Long.parseLong(value.toString());
     }
 }
-
-

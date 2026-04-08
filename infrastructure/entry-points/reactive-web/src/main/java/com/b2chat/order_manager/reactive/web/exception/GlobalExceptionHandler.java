@@ -21,14 +21,11 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    /**
-     * Maneja valores inválidos en enums (ej: status que no existe en OrderStatus).
-     * En WebFlux Jackson lanza ServerWebInputException que envuelve InvalidFormatException.
-     */
+
     @ExceptionHandler(ServerWebInputException.class)
     public ResponseEntity<ErrorResponse> handleInvalidInput(ServerWebInputException ex) {
-        Throwable cause = ex.getCause() != null ? ex.getCause().getCause() : null;
-        if (cause instanceof InvalidFormatException invalidFormat
+        InvalidFormatException invalidFormat = findCause(ex, InvalidFormatException.class);
+        if (invalidFormat != null
                 && invalidFormat.getTargetType() != null
                 && invalidFormat.getTargetType().isEnum()) {
             String validValues = java.util.Arrays.stream(invalidFormat.getTargetType().getEnumConstants())
@@ -43,6 +40,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Formato de entrada inválido"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends Throwable> T findCause(Throwable ex, Class<T> type) {
+        Throwable current = ex;
+        while (current != null) {
+            if (type.isInstance(current)) {
+                return (T) current;
+            }
+            current = current.getCause();
+        }
+        return null;
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
@@ -73,8 +82,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ErrorResponse> handleInsufficientStock(InsufficientStockException ex) {
         return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getMessage()));
+                .status(HttpStatus.UNPROCESSABLE_CONTENT)
+                .body(new ErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT.value(), ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

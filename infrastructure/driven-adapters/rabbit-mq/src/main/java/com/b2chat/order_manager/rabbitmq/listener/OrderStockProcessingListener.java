@@ -1,7 +1,6 @@
 package com.b2chat.order_manager.rabbitmq.listener;
 
 import com.b2chat.order_manager.domain.order.OrderEntity;
-import com.b2chat.order_manager.rabbitmq.config.RabbitMQConfig;
 import com.b2chat.order_manager.usecase.OrdersUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ public class OrderStockProcessingListener {
 
     private final OrdersUseCase ordersUseCase;
 
-    @RabbitListener(queues = RabbitMQConfig.PROCESSING_QUEUE)
+    @RabbitListener(queues = "${rabbitmq.order.processing-queue}")
     public void processStock(OrderEntity order) {
         log.info("Procesando stock para orden [id={}]", order.getId());
 

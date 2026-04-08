@@ -31,7 +31,7 @@ public class OrdersUseCase {
 
     public Mono<Void> receiveOrderUseCase(OrderEntity orderRequest) {
         return validateOrderRequest(orderRequest)
-                .then(publishGateway.publishOrderForProcessing(orderRequest));
+                .then(Mono.defer(() -> publishGateway.publishOrderForProcessing(orderRequest)));
     }
 
     public Mono<OrderEntity> createOrderUseCase(OrderEntity orderRequest) {

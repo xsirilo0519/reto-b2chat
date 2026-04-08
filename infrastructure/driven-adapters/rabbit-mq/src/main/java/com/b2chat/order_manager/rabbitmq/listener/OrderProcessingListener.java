@@ -1,7 +1,6 @@
 package com.b2chat.order_manager.rabbitmq.listener;
 
 import com.b2chat.order_manager.domain.order.OrderEntity;
-import com.b2chat.order_manager.rabbitmq.config.RabbitMQConfig;
 import com.b2chat.order_manager.usecase.OrdersUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ public class OrderProcessingListener {
 
     private final OrdersUseCase ordersUseCase;
 
-    @RabbitListener(queues = RabbitMQConfig.PROCESS_QUEUE)
+    @RabbitListener(queues = "${rabbitmq.order.process-queue}")
     public void processOrder(OrderEntity orderRequest) {
         log.info("Procesando pedido en segundo plano para userId={}", orderRequest.getUserId());
 
