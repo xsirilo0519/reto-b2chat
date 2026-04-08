@@ -5,6 +5,7 @@ dependencies {
     implementation project(':domain-usecase')
     implementation project(':driven-adapters-web-client')
     implementation project(':driven-adapters-postgresql-repository')
+    implementation project(':driven-adapters-rabbit-mq')
     implementation project(':entry-points-reactive-web')
 
     implementation 'io.r2dbc:r2dbc-pool'

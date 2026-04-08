@@ -18,6 +18,7 @@ public class OrderEntity {
     private Long userId;
     private OrderStatus status;
     private BigDecimal totalAmount;
+    private boolean completed;
     private List<OrderItemEntity> items;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

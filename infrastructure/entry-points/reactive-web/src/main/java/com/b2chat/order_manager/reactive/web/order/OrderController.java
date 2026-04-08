@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/orders")
@@ -20,10 +22,11 @@ public class OrderController {
     private final OrdersUseCase ordersUseCase;
 
     @PostMapping
-    public Mono<ResponseEntity<OrderResponseDto>> createOrder(@Valid @RequestBody OrderDto orderDto) {
-        return ordersUseCase.createOrderUseCase(OrderMapper.INSTANCE.toEntity(orderDto))
-                .map(OrderMapper.INSTANCE::toResponse)
-                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
+    public Mono<ResponseEntity<Map<String, String>>> createOrder(@Valid @RequestBody OrderDto orderDto) {
+        return ordersUseCase.receiveOrderUseCase(OrderMapper.INSTANCE.toEntity(orderDto))
+                .thenReturn(ResponseEntity
+                        .status(HttpStatus.ACCEPTED)
+                        .<Map<String, String>>body(Map.of("message", "Pedido recibido. Será procesado en breve.")));
     }
 
     @GetMapping("/{id}")
@@ -42,4 +45,3 @@ public class OrderController {
                 .map(ResponseEntity::ok);
     }
 }
-

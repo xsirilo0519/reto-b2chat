@@ -24,6 +24,9 @@ public class OrderData {
     @Column("total_amount")
     private BigDecimal totalAmount;
 
+    @Column("completed")
+    private boolean completed;
+
     @Column("created_at")
     private LocalDateTime createdAt;
 

@@ -66,6 +66,9 @@ public class OrderAdapter implements OrderGateway {
                 .flatMap(existing -> {
                     existing.setStatus(status.name());
                     existing.setUpdatedAt(LocalDateTime.now());
+                    if (status == OrderStatus.COMPLETED) {
+                        existing.setCompleted(true);
+                    }
                     return orderDataRepository.save(existing);
                 })
                 .flatMap(savedOrder ->

@@ -6,6 +6,8 @@ subprojects {
         sourceCompatibility = JavaVersion.VERSION_18
         targetCompatibility = JavaVersion.VERSION_18
     }
+
+    compileJava.options.compilerArgs += ['-parameters']
     repositories {
         mavenCentral()
     }
