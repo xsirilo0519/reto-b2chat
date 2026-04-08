@@ -11,19 +11,20 @@ subprojects {
     }
 
     dependencies {
+        //DB
         implementation 'io.r2dbc:r2dbc-pool:1.0.2.RELEASE'
 
+        //spring-boot
         implementation 'org.springframework.boot:spring-boot-starter-webflux:4.0.5'
-        //implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-        //implementation 'org.springframework.boot:spring-boot-starter-security:2.7.5'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+
         // Lombok
         compileOnly 'org.projectlombok:lombok:1.18.30'
         annotationProcessor 'org.projectlombok:lombok:1.18.30'
         testCompileOnly 'org.projectlombok:lombok:1.18.30'
         testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-
-        // Testing - JUnit 5
+        // Testing
         testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.5'
         testImplementation 'org.junit.jupiter:junit-jupiter-api'
         testImplementation 'org.junit.jupiter:junit-jupiter-engine'

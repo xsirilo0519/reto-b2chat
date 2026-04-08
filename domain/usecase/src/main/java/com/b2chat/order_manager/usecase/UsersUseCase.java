@@ -17,12 +17,10 @@ public class UsersUseCase {
                         .createdAt(LocalDateTime.now())
                         .updatedAt(LocalDateTime.now())
                         .build())
-                .flatMap(userGateway::createUser)
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Error creating user"))));
+                .flatMap(userGateway::createUser);
     }
 
     public Mono<UserEntity> getUserByIdUseCase(Long userId) {
-        return userGateway.getUserById(userId)
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("User not found with id: " + userId))));
+        return userGateway.getUserById(userId);
     }
 }

@@ -4,6 +4,7 @@ import com.b2chat.order_manager.reactive.web.product.dto.ProductDto;
 import com.b2chat.order_manager.reactive.web.product.dto.ProductResponseDto;
 import com.b2chat.order_manager.reactive.web.product.mapper.ProductMapper;
 import com.b2chat.order_manager.usecase.ProductsUseCase;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,27 +26,23 @@ public class ProductController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<ProductResponseDto>> createProduct(@RequestBody ProductDto productDto) {
+    public Mono<ResponseEntity<ProductResponseDto>> createProduct(@Valid @RequestBody ProductDto productDto) {
         return productsUseCase.createProductUseCase(ProductMapper.INSTANCE.toEntity(productDto))
                 .map(ProductMapper.INSTANCE::toResponse)
-                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response))
-                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().build()));
+                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
     }
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<ProductResponseDto>> updateProduct(@PathVariable("id") Long id,
-                                                                  @RequestBody ProductDto productDto) {
+                                                                  @Valid @RequestBody ProductDto productDto) {
         return productsUseCase.updateProductUseCase(id, ProductMapper.INSTANCE.toEntity(productDto))
                 .map(ProductMapper.INSTANCE::toResponse)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> Mono.just(ResponseEntity.notFound().build()));
+                .map(ResponseEntity::ok);
     }
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<String>> deleteProduct(@PathVariable("id") Long id) {
         return productsUseCase.deleteProductUseCase(id)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> Mono.just(ResponseEntity.notFound().build()));
+                .map(ResponseEntity::ok);
     }
 }
-
