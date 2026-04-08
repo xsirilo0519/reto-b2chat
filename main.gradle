@@ -11,8 +11,6 @@ subprojects {
     }
 
     dependencies {
-        //DB
-        implementation 'io.r2dbc:r2dbc-pool:1.0.2.RELEASE'
 
         //spring-boot
         implementation 'org.springframework.boot:spring-boot-starter-webflux:4.0.5'

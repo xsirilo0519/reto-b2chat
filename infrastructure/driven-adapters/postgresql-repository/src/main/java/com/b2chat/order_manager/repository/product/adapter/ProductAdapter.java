@@ -1,11 +1,13 @@
 package com.b2chat.order_manager.repository.product.adapter;
 
+import com.b2chat.order_manager.domain.exception.InsufficientStockException;
 import com.b2chat.order_manager.domain.exception.ResourceNotFoundException;
 import com.b2chat.order_manager.domain.products.entity.ProductEntity;
 import com.b2chat.order_manager.domain.products.gateway.ProductGateway;
 import com.b2chat.order_manager.repository.product.mapper.ProductDataMapper;
 import com.b2chat.order_manager.repository.product.repository.ProductDataRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,23 @@ public class ProductAdapter implements ProductGateway {
     private final ProductDataRepository productDataRepository;
 
     private static final int BATCH_SIZE = 100;
+
+    @Override
+    public Mono<ProductEntity> findProductById(Long id) {
+        return productDataRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Producto", id)))
+                .map(ProductDataMapper.INSTANCE::toDomain);
+    }
+
+    @Override
+    public Mono<Void> decrementStock(Long id, Integer quantity) {
+        return productDataRepository.decrementStockQuery(id, quantity)
+                .filter(count -> count > 0)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Producto", id)))
+                .onErrorResume(DataIntegrityViolationException.class,
+                        e -> Mono.error(new InsufficientStockException("producto id " + id, quantity, 0)))
+                .then();
+    }
 
     @Override
     public Flux<ProductEntity> findAllProducts(int page) {

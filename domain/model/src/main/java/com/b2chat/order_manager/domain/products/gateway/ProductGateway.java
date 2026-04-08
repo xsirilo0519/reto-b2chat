@@ -6,7 +6,9 @@ import reactor.core.publisher.Mono;
 
 public interface ProductGateway {
     Flux<ProductEntity> findAllProducts(int page);
+    Mono<ProductEntity> findProductById(Long id);
     Mono<ProductEntity> createProduct(ProductEntity productEntity);
     Mono<ProductEntity> updateProduct(Long id, ProductEntity productEntity);
+    Mono<Void> decrementStock(Long id, Integer quantity);
     Mono<String> deleteProductById(Long id);
 }
