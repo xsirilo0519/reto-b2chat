@@ -1,0 +1,23 @@
+# Gradle cache y builds previos
+.gradle/
+build/
+*/build/
+**/build/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Docs
+*.md
+README*
+
+# OS
+.DS_Store
+Thumbs.db
+

@@ -1,0 +1,88 @@
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: order-manager-postgres
+    environment:
+      POSTGRES_DB: b2chat_manager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "Sofka2025*"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d b2chat_manager"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── RabbitMQ ────────────────────────────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: order-manager-rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+  # ── Redis ───────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: order-manager-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot App ─────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: order-manager-app
+    ports:
+      - "9090:9090"
+    environment:
+      # Base de datos (apunta al servicio 'postgres')
+      CUSTOM_DB_HOSTURL: "postgres:5432/b2chat_manager"
+      CUSTOM_DB_USERNAME: "postgres"
+      CUSTOM_DB_PASSWORD: "Sofka2025*"
+      CUSTOM_DB_SCHEMA: "public"
+      # RabbitMQ (apunta al servicio 'rabbitmq')
+      SPRING_RABBITMQ_HOST: "rabbitmq"
+      SPRING_RABBITMQ_PORT: "5672"
+      SPRING_RABBITMQ_USERNAME: "guest"
+      SPRING_RABBITMQ_PASSWORD: "guest"
+      # Redis (apunta al servicio 'redis')
+      SPRING_DATA_REDIS_HOST: "redis"
+      SPRING_DATA_REDIS_PORT: "6379"
+      SPRING_DATA_REDIS_REPOSITORIES_ENABLED: "false"
+      # JWT
+      JWT_SECRET: "b2chat-order-manager-super-secret-key-123"
+      JWT_EXPIRATION_MS: "3600000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  postgres_data:

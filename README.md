@@ -38,6 +38,7 @@ order-manager/
 │   ├── driven-adapters/
 │   │   ├── postgresql-repository/  → Implementación R2DBC
 │   │   ├── rabbit-mq/              → RabbitMQ (publicar + escuchar + email)
+│   │   └── redis-cache/            → Caché Redis reactivo (cache-aside)
 │   └── entry-points/
 │       └── reactive-web/           → Controllers REST
 └── applications/
@@ -69,6 +70,52 @@ Consola web: [http://localhost:15672](http://localhost:15672) — usuario: `gues
 ```bash
 podman run -d --name redis-cache -p 6379:6379 redis:7-alpine
 ```
+
+---
+
+## Levantar todo con Podman Compose (recomendado)
+
+El `docker-compose.yml` incluido levanta **todos los servicios** (app + PostgreSQL + RabbitMQ + Redis) con un solo comando.
+
+### Instalar podman-compose
+
+```bash
+pip install podman-compose
+```
+
+### Comandos
+
+```bash
+# Construir imagen y levantar todo (primera vez)
+podman-compose up --build
+
+# Levantar en segundo plano
+podman-compose up --build -d
+
+# Ver logs de la app en vivo
+podman-compose logs -f app
+
+# Detener todo
+podman-compose down
+
+# Detener + borrar volumen de PostgreSQL
+podman-compose down -v
+```
+
+### Servicios incluidos en el Compose
+
+| Servicio | Imagen | Puerto | Descripción |
+|---|---|---|---|
+| `postgres` | `postgres:16-alpine` | `5432` | BD (schema creado automáticamente desde `init.sql`) |
+| `rabbitmq` | `rabbitmq:3-management-alpine` | `5672` / `15672` | Mensajería |
+| `redis` | `redis:7-alpine` | `6379` | Caché de productos |
+| `app` | Build local | `9090` | API Spring Boot |
+
+> La app espera a que los 3 servicios estén **healthy** antes de arrancar.
+>
+> Consola RabbitMQ → [http://localhost:15672](http://localhost:15672) — `guest` / `guest`
+
+---
 
 ### Variables en `application.properties`
 
@@ -484,7 +531,10 @@ La primera consulta va a PostgreSQL y el resultado se almacena en Redis con TTL 
 
 ---
 
+#### `PUT /products/{id}` — Actualizar producto
+
 **Request:**
+
 ```json
 {
   "name": "Laptop Dell XPS 15",
@@ -692,4 +742,3 @@ HTTP 401 Unauthorized
   "timestamp": "2026-04-08T19:44:30.8397375"
 }
 ```
-
