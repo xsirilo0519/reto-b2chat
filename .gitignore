@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 HELP.md
 .gradle
 build/
@@ -6,6 +7,15 @@ build/
 !**/src/test/**/build/
 
 ### STS ###
+=======
+### IntelliJ IDEA ###
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+.kotlin
+
+### Eclipse ###
+>>>>>>> ad016fb9df2b0470333824c57b41bac11b0ec2ac
 .apt_generated
 .classpath
 .factorypath
@@ -17,6 +27,7 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+<<<<<<< HEAD
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -26,6 +37,8 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+=======
+>>>>>>> ad016fb9df2b0470333824c57b41bac11b0ec2ac
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -36,6 +49,12 @@ out/
 ### VS Code ###
 .vscode/
 
+<<<<<<< HEAD
 .idea/
 
 .gradle/
+=======
+### Mac OS ###
+.DS_Store
+.idea/
+>>>>>>> ad016fb9df2b0470333824c57b41bac11b0ec2ac
