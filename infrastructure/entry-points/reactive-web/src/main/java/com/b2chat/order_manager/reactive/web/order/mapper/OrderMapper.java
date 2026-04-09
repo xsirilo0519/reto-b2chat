@@ -19,12 +19,15 @@ public interface OrderMapper {
     @Mapping(target = "totalAmount", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "completed", ignore = true)
     OrderEntity toEntity(OrderDto orderDto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "orderId", ignore = true)
     @Mapping(target = "unitPrice", ignore = true)
     @Mapping(target = "total", ignore = true)
+    @Mapping(target = "productName", ignore = true)
+    @Mapping(target = "productDescription", ignore = true)
     OrderItemEntity toItemEntity(OrderItemDto orderItemDto);
 
     OrderResponseDto toResponse(OrderEntity orderEntity);

@@ -496,7 +496,8 @@ Todos los errores siguen el formato:
 ```json
 {
   "status": 404,
-  "message": "Recurso 'Producto' con id 99 no encontrado"
+  "message": "Recurso 'Producto' con id 99 no encontrado",
+  "timestamp": "2026-04-08T19:43:29.5325225"
 }
 ```
 
@@ -506,4 +507,45 @@ Todos los errores siguen el formato:
 | `404` | Recurso no encontrado |
 | `409` | Email de usuario duplicado |
 | `500` | Error interno del servidor |
+
+---
+
+### Ejemplos reales de respuestas de error
+
+#### `404` — Recurso no encontrado
+
+```json
+{
+  "message": "Usuario no encontrado con id: 10020",
+  "status": 404,
+  "timestamp": "2026-04-08T19:43:29.5325225"
+}
+```
+
+---
+
+#### `409` — Conflicto (email duplicado)
+
+```json
+{
+  "message": "El usuario ya está registrado: 123@1231",
+  "status": 409,
+  "timestamp": "2026-04-08T19:44:09.3217766"
+}
+```
+
+---
+
+#### `400` — Error de validación
+
+```json
+{
+  "errors": {
+    "name": "El nombre no puede estar vacío"
+  },
+  "message": "Error de validación",
+  "status": 400,
+  "timestamp": "2026-04-08T19:44:30.8397375"
+}
+```
 

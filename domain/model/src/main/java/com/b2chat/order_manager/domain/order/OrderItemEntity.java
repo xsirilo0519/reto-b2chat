@@ -18,5 +18,8 @@ public class OrderItemEntity {
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal total;
+    // Enriched fields populated via JOIN with products table
+    private String productName;
+    private String productDescription;
 }
 

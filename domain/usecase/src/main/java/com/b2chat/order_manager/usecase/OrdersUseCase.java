@@ -85,6 +85,11 @@ public class OrdersUseCase {
         return orderGateway.getOrderById(id);
     }
 
+    public Flux<OrderEntity> getOrdersByUserIdUseCase(Long userId) {
+        return userGateway.getUserById(userId)
+                .flatMapMany(user -> orderGateway.getOrdersByUserId(userId));
+    }
+
     public Mono<Void> validateOrderRequest(OrderEntity orderRequest) {
         return userGateway.getUserById(orderRequest.getUserId())
                 .flatMap(user -> Flux.fromIterable(orderRequest.getItems())
