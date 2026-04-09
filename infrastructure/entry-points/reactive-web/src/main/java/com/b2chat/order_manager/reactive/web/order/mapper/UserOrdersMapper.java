@@ -11,6 +11,12 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface UserOrdersMapper {
 
+    /**
+     * INSTANCE se conserva para tests unitarios sin contexto Spring.
+     * MapStruct instancia UserOrdersMapperImpl vía reflexión cuando
+     * el ServiceLoader no encuentra el proveedor (componentModel = "spring"
+     * no registra META-INF/services, pero el fallback reflectivo funciona).
+     */
     UserOrdersMapper INSTANCE = Mappers.getMapper(UserOrdersMapper.class);
 
     /** OrderItemEntity.total  ──▶  OrderItemSummaryDto.subtotal */

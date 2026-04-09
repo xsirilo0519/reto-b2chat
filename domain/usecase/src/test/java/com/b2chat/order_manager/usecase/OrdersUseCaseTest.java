@@ -369,5 +369,60 @@ class OrdersUseCaseTest {
                 .expectError(ResourceNotFoundException.class)
                 .verify();
     }
+
+
+
+    @Test
+    @DisplayName("getOrdersByUserIdUseCase - debe delegar directamente al gateway sin consultar el usuario")
+    void getOrdersByUserIdUseCase_shouldDelegateToGateway_withoutUserValidation() {
+        OrderEntity order1 = buildSavedOrder(OrderStatus.PENDING);
+        OrderEntity order2 = buildSavedOrder(OrderStatus.COMPLETED);
+        when(orderGateway.getOrdersByUserId(1L)).thenReturn(Flux.just(order1, order2));
+
+        StepVerifier.create(ordersUseCase.getOrdersByUserIdUseCase(1L))
+                .assertNext(o -> assertThat(o.getStatus()).isEqualTo(OrderStatus.PENDING))
+                .assertNext(o -> assertThat(o.getStatus()).isEqualTo(OrderStatus.COMPLETED))
+                .verifyComplete();
+
+        verify(orderGateway).getOrdersByUserId(1L);
+        verify(userGateway, never()).getUserById(any());
+    }
+
+    @Test
+    @DisplayName("getOrdersByUserIdUseCase - debe retornar Flux vacío cuando el usuario no tiene pedidos")
+    void getOrdersByUserIdUseCase_shouldReturnEmptyFlux_whenNoOrdersFound() {
+        when(orderGateway.getOrdersByUserId(99L)).thenReturn(Flux.empty());
+
+        StepVerifier.create(ordersUseCase.getOrdersByUserIdUseCase(99L))
+                .verifyComplete();
+
+        verify(orderGateway).getOrdersByUserId(99L);
+        verify(userGateway, never()).getUserById(any());
+    }
+
+    @Test
+    @DisplayName("getOrdersByUserIdUseCase - debe retornar Flux vacío incluso si el userId no existe (sin 404)")
+    void getOrdersByUserIdUseCase_shouldReturnEmpty_whenUserDoesNotExist() {
+        when(orderGateway.getOrdersByUserId(999L)).thenReturn(Flux.empty());
+
+        StepVerifier.create(ordersUseCase.getOrdersByUserIdUseCase(999L))
+                .verifyComplete();
+
+        verify(userGateway, never()).getUserById(any());
+    }
+
+    @Test
+    @DisplayName("getOrdersByUserIdUseCase - debe retornar todos los pedidos del usuario")
+    void getOrdersByUserIdUseCase_shouldReturnAllOrders_forGivenUserId() {
+        OrderEntity pending  = buildSavedOrder(OrderStatus.PENDING);
+        OrderEntity processing = buildSavedOrder(OrderStatus.PROCESSING);
+        OrderEntity completed  = buildSavedOrder(OrderStatus.COMPLETED);
+        when(orderGateway.getOrdersByUserId(1L))
+                .thenReturn(Flux.just(pending, processing, completed));
+
+        StepVerifier.create(ordersUseCase.getOrdersByUserIdUseCase(1L))
+                .expectNextCount(3)
+                .verifyComplete();
+    }
 }
 
