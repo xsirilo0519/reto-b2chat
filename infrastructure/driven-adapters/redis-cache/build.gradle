@@ -1,0 +1,12 @@
+dependencies {
+    implementation project(':domain-model')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive:4.0.5'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    testImplementation 'io.projectreactor:reactor-test'
+}
+

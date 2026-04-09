@@ -13,6 +13,8 @@ Sistema de gestión de pedidos de comercio electrónico construido con **Java 18
 | Spring WebFlux | API reactiva no bloqueante |
 | Spring Data R2DBC | Acceso reactivo a PostgreSQL |
 | PostgreSQL | Base de datos relacional |
+| Redis | Caché de productos (cache-aside) |
+| Spring Data Redis Reactive | Integración reactiva con Redis |
 | RabbitMQ | Mensajería asíncrona |
 | Spring AMQP | Integración con RabbitMQ |
 | JavaMailSender | Envío de emails |
@@ -51,6 +53,7 @@ order-manager/
 - Java 18+
 - PostgreSQL corriendo en `localhost:5432`
 - RabbitMQ corriendo en `localhost:5672`
+- Redis corriendo en `localhost:6379`
 - (Opcional) Cuenta Gmail con App Password para emails
 
 ### Levantar RabbitMQ con Podman/Docker
@@ -60,6 +63,12 @@ podman run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 
 Consola web: [http://localhost:15672](http://localhost:15672) — usuario: `guest` / contraseña: `guest`
+
+### Levantar Redis con Podman/Docker
+
+```bash
+podman run -d --name redis-cache -p 6379:6379 redis:7-alpine
+```
 
 ### Variables en `application.properties`
 
@@ -76,6 +85,11 @@ custom.db.hostUrl=localhost:5432/b2chat_manager
 custom.db.username=postgres
 custom.db.password=tu_password
 custom.db.schema=public
+
+# Redis
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.data.redis.repositories.enabled=false
 
 # RabbitMQ - conexión
 spring.rabbitmq.host=localhost
@@ -446,7 +460,29 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:9090/products
 
 ---
 
-#### `PUT /products/{id}` — Actualizar producto
+#### `GET /products/{id}` — Obtener producto por ID *(con caché Redis)*
+
+La primera consulta va a PostgreSQL y el resultado se almacena en Redis con TTL de 10 minutos. Las consultas siguientes son servidas directamente desde caché.
+
+**Response `200 OK`:**
+```json
+{
+  "id": 1,
+  "name": "Laptop Dell XPS",
+  "description": "Laptop de alto rendimiento",
+  "price": 2500.00,
+  "stockQuantity": 10,
+  "createdAt": "2026-04-08T10:00:00",
+  "updatedAt": "2026-04-08T10:00:00"
+}
+```
+
+**Errores:**
+- `404` — producto no encontrado
+
+> Al hacer `PUT /products/{id}` o `DELETE /products/{id}`, la entrada en caché se evicta automáticamente.
+
+---
 
 **Request:**
 ```json

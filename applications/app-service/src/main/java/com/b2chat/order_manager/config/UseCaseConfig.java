@@ -3,6 +3,7 @@ package com.b2chat.order_manager.config;
 import com.b2chat.order_manager.domain.notification.OrderNotificationGateway;
 import com.b2chat.order_manager.domain.order.OrderGateway;
 import com.b2chat.order_manager.domain.order.OrderPublishGateway;
+import com.b2chat.order_manager.domain.products.gateway.ProductCacheGateway;
 import com.b2chat.order_manager.domain.products.gateway.ProductGateway;
 import com.b2chat.order_manager.domain.users.gateway.UserGateway;
 import com.b2chat.order_manager.usecase.OrdersUseCase;
@@ -20,8 +21,9 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public ProductsUseCase productsUseCase(ProductGateway productGateway) {
-        return new ProductsUseCase(productGateway);
+    public ProductsUseCase productsUseCase(ProductGateway productGateway,
+                                           ProductCacheGateway productCacheGateway) {
+        return new ProductsUseCase(productGateway, productCacheGateway);
     }
 
     @Bean

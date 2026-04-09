@@ -25,6 +25,13 @@ public class ProductController {
                 .map(ProductMapper.INSTANCE::toResponse);
     }
 
+    @GetMapping("/{id}")
+    public Mono<ResponseEntity<ProductResponseDto>> getProductById(@PathVariable("id") Long id) {
+        return productsUseCase.getProductByIdUseCase(id)
+                .map(ProductMapper.INSTANCE::toResponse)
+                .map(ResponseEntity::ok);
+    }
+
     @PostMapping
     public Mono<ResponseEntity<ProductResponseDto>> createProduct(@Valid @RequestBody ProductDto productDto) {
         return productsUseCase.createProductUseCase(ProductMapper.INSTANCE.toEntity(productDto))

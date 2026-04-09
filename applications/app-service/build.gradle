@@ -5,12 +5,17 @@ dependencies {
     implementation project(':domain-usecase')
     implementation project(':driven-adapters-postgresql-repository')
     implementation project(':driven-adapters-rabbit-mq')
+    implementation project(':driven-adapters-redis-cache')
     implementation project(':entry-points-reactive-web')
 
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'io.r2dbc:r2dbc-pool'
     implementation 'io.r2dbc:r2dbc-spi'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive:4.0.5'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-r2dbc:4.0.5'

@@ -3,6 +3,7 @@ package com.b2chat.order_manager.config;
 import com.b2chat.order_manager.domain.notification.OrderNotificationGateway;
 import com.b2chat.order_manager.domain.order.OrderGateway;
 import com.b2chat.order_manager.domain.order.OrderPublishGateway;
+import com.b2chat.order_manager.domain.products.gateway.ProductCacheGateway;
 import com.b2chat.order_manager.domain.products.gateway.ProductGateway;
 import com.b2chat.order_manager.domain.users.gateway.UserGateway;
 import com.b2chat.order_manager.usecase.OrdersUseCase;
@@ -23,6 +24,7 @@ class UseCaseConfigTest {
 
     @Mock private UserGateway userGateway;
     @Mock private ProductGateway productGateway;
+    @Mock private ProductCacheGateway productCacheGateway;
     @Mock private OrderGateway orderGateway;
     @Mock private OrderNotificationGateway notificationGateway;
     @Mock private OrderPublishGateway publishGateway;
@@ -59,22 +61,22 @@ class UseCaseConfigTest {
     @Test
     @DisplayName("productsUseCase - debe crear un bean ProductsUseCase no nulo")
     void productsUseCase_shouldReturnNonNullBean() {
-        ProductsUseCase result = useCaseConfig.productsUseCase(productGateway);
+        ProductsUseCase result = useCaseConfig.productsUseCase(productGateway, productCacheGateway);
         assertThat(result).isNotNull();
     }
 
     @Test
     @DisplayName("productsUseCase - debe crear una instancia de tipo ProductsUseCase")
     void productsUseCase_shouldReturnCorrectType() {
-        ProductsUseCase result = useCaseConfig.productsUseCase(productGateway);
+        ProductsUseCase result = useCaseConfig.productsUseCase(productGateway, productCacheGateway);
         assertThat(result).isInstanceOf(ProductsUseCase.class);
     }
 
     @Test
     @DisplayName("productsUseCase - cada llamada debe retornar una nueva instancia")
     void productsUseCase_shouldReturnNewInstanceEachCall() {
-        ProductsUseCase first  = useCaseConfig.productsUseCase(productGateway);
-        ProductsUseCase second = useCaseConfig.productsUseCase(productGateway);
+        ProductsUseCase first  = useCaseConfig.productsUseCase(productGateway, productCacheGateway);
+        ProductsUseCase second = useCaseConfig.productsUseCase(productGateway, productCacheGateway);
         assertThat(first).isNotSameAs(second);
     }
 

@@ -1,5 +1,6 @@
 package com.b2chat.order_manager.reactive.web.product;
 
+import com.b2chat.order_manager.domain.exception.ResourceNotFoundException;
 import com.b2chat.order_manager.domain.products.entity.ProductEntity;
 import com.b2chat.order_manager.reactive.web.exception.GlobalExceptionHandler;
 import com.b2chat.order_manager.reactive.web.product.dto.ProductDto;
@@ -116,6 +117,62 @@ class ProductControllerTest {
                 .hasSize(0);
     }
 
+
+    // ── GET /products/{id} ────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("GET /products/{id} - debe retornar 200 OK con el producto cuando existe (puede venir de caché o BD)")
+    void getProductById_shouldReturnProduct_whenFound() {
+        ProductEntity product = ProductEntity.builder()
+                .id(1L).name("Laptop").description("High-end laptop")
+                .price(BigDecimal.valueOf(1500.0)).stockQuantity(10)
+                .createdAt(LocalDateTime.of(2025, 1, 1, 10, 0))
+                .updatedAt(LocalDateTime.of(2025, 1, 1, 10, 0))
+                .build();
+        when(productsUseCase.getProductByIdUseCase(1L)).thenReturn(Mono.just(product));
+
+        webTestClient.get().uri("/products/1").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(1)
+                .jsonPath("$.name").isEqualTo("Laptop")
+                .jsonPath("$.description").isEqualTo("High-end laptop")
+                .jsonPath("$.price").isEqualTo(1500.0)
+                .jsonPath("$.stockQuantity").isEqualTo(10);
+
+        verify(productsUseCase).getProductByIdUseCase(1L);
+    }
+
+    @Test
+    @DisplayName("GET /products/{id} - debe retornar 404 cuando el producto no existe")
+    void getProductById_shouldReturn404_whenProductNotFound() {
+        when(productsUseCase.getProductByIdUseCase(99L))
+                .thenReturn(Mono.error(new ResourceNotFoundException("Producto", 99L)));
+
+        webTestClient.get().uri("/products/99").exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(404)
+                .jsonPath("$.message").isEqualTo("Producto no encontrado con id: 99");
+
+        verify(productsUseCase).getProductByIdUseCase(99L);
+    }
+
+    @Test
+    @DisplayName("GET /products/{id} - debe retornar 500 cuando el use case lanza RuntimeException")
+    void getProductById_shouldReturn500_whenUseCaseThrowsRuntimeException() {
+        when(productsUseCase.getProductByIdUseCase(1L))
+                .thenReturn(Mono.error(new RuntimeException("Error inesperado")));
+
+        webTestClient.get().uri("/products/1").exchange()
+                .expectStatus().isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR)
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(500)
+                .jsonPath("$.message").isEqualTo("Error interno del servidor");
+    }
+
+
+    // ── POST /products ────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("POST /products - debe retornar 201 CREATED cuando el producto es válido")

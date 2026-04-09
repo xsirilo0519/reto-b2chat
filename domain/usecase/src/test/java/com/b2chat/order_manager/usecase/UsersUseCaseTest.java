@@ -34,7 +34,6 @@ class UsersUseCaseTest {
         usersUseCase = new UsersUseCase(userGateway);
     }
 
-
     private UserEntity buildUserRequest() {
         return UserEntity.builder()
                 .name("Juan Pérez")
