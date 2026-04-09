@@ -16,6 +16,8 @@ Sistema de gestión de pedidos de comercio electrónico construido con **Java 18
 | RabbitMQ | Mensajería asíncrona |
 | Spring AMQP | Integración con RabbitMQ |
 | JavaMailSender | Envío de emails |
+| Spring Security 7 | Autenticación y autorización |
+| JWT (jjwt 0.12) | Tokens Bearer para proteger endpoints |
 | MapStruct | Mapeo de objetos |
 | Lombok | Reducción de boilerplate |
 
@@ -63,18 +65,40 @@ Consola web: [http://localhost:15672](http://localhost:15672) — usuario: `gues
 
 ```properties
 server.port=9090
+spring.application.name=order-manager
+
+# JWT
+jwt.secret=b2chat-order-manager-super-secret-key-123
+jwt.expiration-ms=3600000
 
 # Base de datos
-custom.db.hostUrl=localhost:5432/nombre_base_datos
+custom.db.hostUrl=localhost:5432/b2chat_manager
 custom.db.username=postgres
 custom.db.password=tu_password
 custom.db.schema=public
 
-# RabbitMQ
+# RabbitMQ - conexión
 spring.rabbitmq.host=localhost
 spring.rabbitmq.port=5672
 spring.rabbitmq.username=guest
 spring.rabbitmq.password=guest
+
+# RabbitMQ - exchange
+rabbitmq.order.exchange=order.exchange
+
+# RabbitMQ - colas
+rabbitmq.order.process-queue=order.process.queue
+rabbitmq.order.processing-queue=order.processing.queue
+rabbitmq.order.received-queue=order.notification.received.queue
+rabbitmq.order.completed-queue=order.notification.completed.queue
+rabbitmq.order.cancelled-queue=order.notification.cancelled.queue
+
+# RabbitMQ - routing keys
+rabbitmq.order.process-key=order.process
+rabbitmq.order.processing-key=order.processing
+rabbitmq.order.received-key=order.notification.received
+rabbitmq.order.completed-key=order.notification.completed
+rabbitmq.order.cancelled-key=order.notification.cancelled
 
 # Email Gmail (requiere App Password)
 spring.mail.host=smtp.gmail.com
@@ -244,9 +268,83 @@ El campo `completed BOOLEAN DEFAULT FALSE` protege contra el doble descuento de 
 
 ---
 
+## Autenticación JWT
+
+Todos los endpoints (excepto `/auth/login`) están protegidos. Si se accede sin token o con uno inválido, se retorna **`401 Unauthorized`**.
+
+### Flujo de autenticación
+
+```
+1. POST /auth/login  →  recibe el token JWT
+2. Incluir en cada request el header:
+       Authorization: Bearer <token>
+```
+
+### Credenciales
+
+| Campo | Valor |
+|---|---|
+| `username` | `admin` |
+| `password` | `admin` |
+
+### `POST /auth/login` — Obtener token
+
+**Request:**
+```json
+{
+  "username": "admin",
+  "password": "admin"
+}
+```
+
+**Response `200 OK`:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIs...",
+  "type": "Bearer",
+  "username": "admin"
+}
+```
+
+**Errores:**
+- `401 Unauthorized` — credenciales incorrectas
+
+### Uso del token en los demás endpoints
+
+Agregar el header en todas las peticiones protegidas:
+
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+```
+
+**Ejemplo con curl:**
+```bash
+# 1. Obtener token
+TOKEN=$(curl -s -X POST http://localhost:9090/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin"}' | jq -r '.token')
+
+# 2. Usar el token en una petición protegida
+curl -H "Authorization: Bearer $TOKEN" http://localhost:9090/products
+```
+
+### Configuración JWT en `application.properties`
+
+| Propiedad | Descripción | Valor por defecto |
+|---|---|---|
+| `jwt.secret` | Clave secreta para firmar tokens (mín. 32 caracteres) | — |
+| `jwt.expiration-ms` | Tiempo de expiración en milisegundos | `3600000` (1 hora) |
+
+---
+
 ## API — Endpoints
 
 > Base URL: `http://localhost:9090`
+>
+> ⚠️ **Todos los endpoints excepto `POST /auth/login` requieren el header:**
+> ```
+> Authorization: Bearer <token>
+> ```
 
 ---
 
@@ -504,6 +602,7 @@ Todos los errores siguen el formato:
 | HTTP | Causa |
 |---|---|
 | `400` | Validación de campos o enum inválido |
+| `401` | Token ausente, inválido o expirado |
 | `404` | Recurso no encontrado |
 | `409` | Email de usuario duplicado |
 | `500` | Error interno del servidor |
@@ -511,6 +610,15 @@ Todos los errores siguen el formato:
 ---
 
 ### Ejemplos reales de respuestas de error
+
+#### `401` — Sin token o token inválido
+
+```
+HTTP 401 Unauthorized
+(sin body)
+```
+
+---
 
 #### `404` — Recurso no encontrado
 

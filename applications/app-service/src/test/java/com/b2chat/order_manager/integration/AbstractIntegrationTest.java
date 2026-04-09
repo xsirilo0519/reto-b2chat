@@ -13,11 +13,15 @@ import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Map;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
@@ -101,9 +105,11 @@ public abstract class AbstractIntegrationTest {
 
     @BeforeEach
     void resetInfrastructureState() {
+        String token = obtainJwtToken();
         webTestClient = WebTestClient.bindToServer()
                 .responseTimeout(Duration.ofSeconds(20))
                 .baseUrl("http://localhost:" + port)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .build();
         purgeQueue(ORDER_PROCESS_QUEUE);
         purgeQueue(ORDER_PROCESSING_QUEUE);
@@ -111,6 +117,22 @@ public abstract class AbstractIntegrationTest {
         purgeQueue(ORDER_COMPLETED_QUEUE);
         purgeQueue(ORDER_CANCELLED_QUEUE);
         resetDatabase();
+    }
+
+    protected String obtainJwtToken() {
+        Map<?, ?> response = WebTestClient.bindToServer()
+                .baseUrl("http://localhost:" + port)
+                .build()
+                .post()
+                .uri("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("username", "admin", "password", "admin"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Map.class)
+                .returnResult()
+                .getResponseBody();
+        return response != null ? (String) response.get("token") : "";
     }
 
     protected void resetDatabase() {
